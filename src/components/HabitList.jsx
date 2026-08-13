@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const MAX_HABITS = 7;
+const MAX_HABITS = 10;
 
 /**
  * Panel de configuración de hábitos. Permite agregar (hasta 7), renombrar
