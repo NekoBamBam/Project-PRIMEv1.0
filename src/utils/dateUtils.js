@@ -34,6 +34,16 @@ export function getPeriodKey(month, year) {
 }
 
 /**
+ * Construye una fecha ISO "YYYY-MM-DD" para un día puntual del período,
+ * tal como la espera la columna `log_date` (date) de Supabase.
+ */
+export function toISODate(day, month, year) {
+  const mm = String(month + 1).padStart(2, "0");
+  const dd = String(day).padStart(2, "0");
+  return `${year}-${mm}-${dd}`;
+}
+
+/**
  * Indica si (day, month, year) corresponde a la fecha de hoy,
  * para resaltar la columna del día actual en la grilla.
  */

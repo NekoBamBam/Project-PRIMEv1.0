@@ -1,37 +1,31 @@
 import { useState } from "react";
 
-const MAX_HABITS = 10;
-
 /**
- * Panel de configuración de hábitos. Permite agregar (hasta 7), renombrar
- * y eliminar hábitos. La lista de hábitos es global (no depende del mes),
- * mientras que el estado día a día sí depende del mes/año seleccionado.
+ * Panel de configuración de hábitos. Permite agregar (hasta maxHabits),
+ * renombrar y eliminar hábitos.
+ *
+ * A diferencia de la versión con localStorage (que tenía un solo
+ * `onChange(nuevaListaCompleta)`), acá cada acción llama a una función
+ * puntual porque cada una dispara una operación distinta contra Supabase
+ * (insert / update / delete) en el hook useHabits.
  *
  * Props:
  * - habits: [{ id, name }]
- * - onChange: (nuevaListaHabitos) => void
+ * - maxHabits: number
+ * - onAdd: (name) => void
+ * - onRename: (id, name) => void
+ * - onRemove: (id) => void
  */
-export default function HabitList({ habits, onChange }) {
+export default function HabitList({ habits, maxHabits, onAdd, onRename, onRemove }) {
   const [nuevoHabito, setNuevoHabito] = useState("");
 
-  const puedeAgregar = habits.length < MAX_HABITS;
+  const puedeAgregar = habits.length < maxHabits;
 
   function agregarHabito(e) {
     e.preventDefault();
-    const nombre = nuevoHabito.trim();
-    if (!nombre || !puedeAgregar) return;
-
-    const habitoCreado = { id: crypto.randomUUID(), name: nombre };
-    onChange([...habits, habitoCreado]);
+    if (!nuevoHabito.trim() || !puedeAgregar) return;
+    onAdd(nuevoHabito.trim());
     setNuevoHabito("");
-  }
-
-  function renombrarHabito(id, nombre) {
-    onChange(habits.map((h) => (h.id === id ? { ...h, name: nombre } : h)));
-  }
-
-  function eliminarHabito(id) {
-    onChange(habits.filter((h) => h.id !== id));
   }
 
   return (
@@ -41,7 +35,7 @@ export default function HabitList({ habits, onChange }) {
           Mis Hábitos
         </h2>
         <span className="text-xs font-medium text-prime-gold">
-          {habits.length}/{MAX_HABITS}
+          {habits.length}/{maxHabits}
         </span>
       </div>
 
@@ -54,14 +48,14 @@ export default function HabitList({ habits, onChange }) {
             <input
               type="text"
               value={habit.name}
-              onChange={(e) => renombrarHabito(habit.id, e.target.value)}
+              onChange={(e) => onRename(habit.id, e.target.value)}
               className="flex-1 min-w-0 rounded-lg border border-prime-borderLight dark:border-prime-border
                          bg-transparent px-3 py-1.5 text-sm text-prime-ink dark:text-white
                          focus:outline-none focus:ring-2 focus:ring-prime-gold"
             />
             <button
               type="button"
-              onClick={() => eliminarHabito(habit.id)}
+              onClick={() => onRemove(habit.id)}
               aria-label={`Eliminar hábito ${habit.name}`}
               className="shrink-0 text-neutral-400 hover:text-state-fail transition-colors px-1"
             >
@@ -100,7 +94,7 @@ export default function HabitList({ habits, onChange }) {
         </form>
       ) : (
         <p className="text-xs text-neutral-400">
-          Alcanzaste el máximo de {MAX_HABITS} hábitos. Eliminá uno para agregar otro.
+          Alcanzaste el máximo de {maxHabits} hábitos. Eliminá uno para agregar otro.
         </p>
       )}
     </section>
