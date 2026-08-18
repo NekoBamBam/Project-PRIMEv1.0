@@ -1,45 +1,54 @@
-# 31 Días para MI PRIME — Tracker de Hábitos (MVP)
+# 🚀 Mi Prime Tracker
 
-MVP de seguimiento de hábitos diarios: hasta 7 hábitos, grilla mensual de 31
-días, estados neutro/cumplido/no cumplido, notas de "Hacer Menos" / "Hacer
-Más" y modo claro/oscuro. Todo se persiste en `localStorage`.
+> **31 Días Para Mi Prime** — Una aplicación web moderna para la creación, seguimiento y consistencia de hábitos diarios, potenciada por una arquitectura serverless en la nube.
 
-## Instalación
+---
+
+## 📌 Descripción
+
+**Mi Prime Tracker** es una herramienta interactiva diseñada para ayudarte a construir disciplina y monitorear tus metas diarias. Permite gestionar hábitos personalizados, registrar el progreso diario en una grilla visual e incluir notas mensuales de enfoque (*"Hacer Más / Hacer Menos"*). 
+
+Cuenta con autenticación de usuarios y persistencia de datos en tiempo real mediante **Supabase**, garantizando que tu progreso esté accesible de forma segura desde cualquier dispositivo.
+
+---
+
+## ✨ Características Principales
+
+* 🔒 **Autenticación Segura:** Sistema de registro, inicio de sesión y gestión de sesiones mediante Supabase Auth.
+* 📅 **Grilla Interactiva de Hábitos:** Seguimiento visual mensual por estados (completado, fallido, neutral).
+* ⚡ **Actualización Optimista:** Experiencia de usuario fluida con respuestas instantáneas en la UI.
+* 📝 **Notas de Enfoque Mensual:** Secciones dedicadas a reflexionar sobre qué hábitos incrementar o reducir cada mes, con guardado automático (*debounced*).
+* 🛡️ **Seguridad a Nivel de Filas (RLS):** Cada usuario tiene acceso exclusivo y privado únicamente a sus propios datos.
+* 🎨 **Interfaz Moderna & Responsiva:** Diseñada con Tailwind CSS para una experiencia visual oscura y limpia (*Dark Mode*).
+
+---
+
+## 🛠️ Stack Tecnológico
+
+| Capa | Tecnología |
+| :--- | :--- |
+| **Frontend** | React 18, Vite |
+| **Estilos** | Tailwind CSS, Lucide Icons |
+| **Backend & Base de Datos** | Supabase (PostgreSQL) |
+| **Autenticación** | Supabase Auth (JWT) |
+| **Despliegue** | Vercel / Netlify *(o la plataforma que utilices)* |
+
+---
+
+## 🗄️ Esquema de Base de Datos
+
+El proyecto utiliza tres tablas principales en PostgreSQL dentro de Supabase con **Row Level Security (RLS)** activado:
+
+* **`habits`**: Almacena los hábitos del usuario (`id`, `user_id`, `title`, `position`).
+* **`habit_logs`**: Guarda el estado diario de cada hábito (`id`, `user_id`, `habit_id`, `date`, `status`). Posee un constraint `UNIQUE(habit_id, date)`.
+* **`monthly_notes`**: Guarda reflexiones de enfoque por período (`id`, `user_id`, `year_month`, `do_more`, `do_less`).
+
+---
+
+## ⚙️ Configuración del Proyecto
+
+### 1. Clonar el repositorio
 
 ```bash
-npm install
-npm run dev
-```
-
-Abrí la URL que muestra la terminal (por defecto `http://localhost:5173`).
-
-## Build de producción
-
-```bash
-npm run build
-npm run preview
-```
-
-## Estructura
-
-```
-src/
-  components/
-    HabitList.jsx          Alta/baja/edición de hábitos (máx. 7)
-    HabitTrackerGrid.jsx    Grilla 31 días x N hábitos, celdas cíclicas
-    NotesSection.jsx        Notas "Hacer Menos" / "Hacer Más"
-    MonthYearSelector.jsx   Selector de mes y año
-    DarkModeToggle.jsx      Switch de tema claro/oscuro
-  hooks/
-    useLocalStorage.js      Hook genérico de persistencia
-  utils/
-    dateUtils.js            Helpers de fechas (días del mes, período, etc.)
-  App.jsx                   Orquesta el estado global
-```
-
-## Próximos pasos sugeridos
-
-- Exportar/importar datos como JSON (backup manual).
-- Reordenar hábitos con drag & drop.
-- Vista de resumen histórico (comparar meses).
-- Migrar de localStorage a un backend cuando deje de ser MVP.
+git clone [https://github.com/tu-usuario/mi-prime-tracker.git](https://github.com/tu-usuario/mi-prime-tracker.git)
+cd mi-prime-tracker
