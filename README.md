@@ -43,12 +43,3 @@ El proyecto utiliza tres tablas principales en PostgreSQL dentro de Supabase con
 * **`habit_logs`**: Guarda el estado diario de cada hábito (`id`, `user_id`, `habit_id`, `date`, `status`). Posee un constraint `UNIQUE(habit_id, date)`.
 * **`monthly_notes`**: Guarda reflexiones de enfoque por período (`id`, `user_id`, `year_month`, `do_more`, `do_less`).
 
----
-
-## ⚙️ Configuración del Proyecto
-
-### 1. Clonar el repositorio
-
-```bash
-git clone [https://github.com/tu-usuario/mi-prime-tracker.git](https://github.com/tu-usuario/mi-prime-tracker.git)
-cd mi-prime-tracker
