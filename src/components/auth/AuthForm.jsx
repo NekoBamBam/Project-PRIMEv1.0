@@ -5,6 +5,18 @@ import { useAuth } from "../../context/AuthContext";
  * Formulario de autenticación simple: alterna entre "Ingresar" y "Crear cuenta"
  * usando el mismo par de campos email/password.
  */
+
+/* 
+futuro google
+const handleGoogleLogin = async () => {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin, // Redirige de vuelta a tu app tras autenticar
+    },
+  });
+  if (error) console.error("Error al iniciar sesión con Google:", error.message);
+}; */
 export default function AuthForm() {
   const { signIn, signUp } = useAuth();
 
