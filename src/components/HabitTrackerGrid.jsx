@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { isToday } from "../utils/dateUtils";
 
 // Ciclo de estados de cada celda al hacer click: neutro -> cumplido -> no cumplido -> neutro
@@ -28,7 +29,7 @@ function siguienteEstado(actual) {
  * - daysInMonth: number
  * - month, year: número de mes (0-11) y año, para resaltar la columna de "hoy"
  * - tracking: { [habitId]: { [day]: 'neutral' | 'done' | 'fail' } } — SOLO del período actual
- * - onToggleCell: (habitId, day, nuevoEstado) => void — recibe ya calculado el próximo estado del ciclo
+ * - onToggleCell: (habitId, day, nuevoEstado) => void — recibe ya calculated el próximo estado del ciclo
  */
 export default function HabitTrackerGrid({
   habits,
@@ -39,6 +40,21 @@ export default function HabitTrackerGrid({
   onToggleCell,
 }) {
   const dias = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  const scrollContainerRef = useRef(null);
+  const todayThRef = useRef(null);
+
+  // Auto-scroll al día de hoy al cargar la grilla o cambiar de período
+  useEffect(() => {
+    if (todayThRef.current && scrollContainerRef.current) {
+      setTimeout(() => {
+        todayThRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "center",
+        });
+      }, 150);
+    }
+  }, [month, year]);
 
   if (habits.length === 0) {
     return (
@@ -50,25 +66,29 @@ export default function HabitTrackerGrid({
 
   return (
     <div className="rounded-2xl bg-white dark:bg-prime-surface border border-prime-borderLight dark:border-prime-border overflow-hidden">
-      <div className="overflow-x-auto thin-scrollbar">
+      <div ref={scrollContainerRef} className="overflow-x-auto thin-scrollbar">
         <table className="border-collapse w-full">
           <thead>
             <tr>
               {/* Celda vacía sobre los nombres de hábito, sticky en el scroll horizontal */}
               <th className="sticky left-0 z-10 bg-white dark:bg-prime-surface p-3 text-left w-40 min-w-[10rem]" />
-              {dias.map((day) => (
-                <th
-                  key={day}
-                  className={`p-1 text-[11px] font-semibold w-8 min-w-[2rem] text-center
-                    ${
-                      isToday(day, month, year)
-                        ? "text-prime-gold"
-                        : "text-neutral-400 dark:text-neutral-500"
-                    }`}
-                >
-                  {day}
-                </th>
-              ))}
+              {dias.map((day) => {
+                const esHoy = isToday(day, month, year);
+                return (
+                  <th
+                    key={day}
+                    ref={esHoy ? todayThRef : null}
+                    className={`p-1 text-[11px] font-semibold w-8 min-w-[2rem] text-center
+                      ${
+                        esHoy
+                          ? "text-prime-gold font-bold"
+                          : "text-neutral-400 dark:text-neutral-500"
+                      }`}
+                  >
+                    {day}
+                  </th>
+                );
+              })}
               <th className="p-2 text-[11px] font-semibold text-neutral-400 w-14 min-w-[3.5rem] text-center">
                 %
               </th>
