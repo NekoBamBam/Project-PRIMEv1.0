@@ -57,25 +57,24 @@ export default function App() {
     if (!exportTemplateRef.current) return;
 
     try {
-      setIsExporting(true);
-
-      // Le damos un instante para asegurar que la plantilla oculta esté cargada
+      // 1. Damos un pequeño respiro al event loop para asegurar que el DOM esté 100% actualizado
       await new Promise((resolve) => setTimeout(resolve, 100));
 
+      // 2. Exportamos omitiendo el análisis de cssRules externas de Google Fonts
       const dataUrl = await toPng(exportTemplateRef.current, {
-        cacheBust: true,
         quality: 0.95,
-        backgroundColor: isDark ? "#0f172a" : "#f8fafc",
+        pixelRatio: 2, // Para que la imagen salga en HD
+        skipFonts: true, // EVITA EL ERROR SecurityError con Google Fonts
+        cacheBust: true,
       });
 
+      // 3. Descarga de la imagen
       const link = document.createElement("a");
-      link.download = `31-dias-mi-prime-${getMonthName(period.month)}-${period.year}.png`;
+      link.download = `MiPrime_${period.year}_${period.month + 1}.png`;
       link.href = dataUrl;
       link.click();
     } catch (err) {
-      console.error("Error al exportar la imagen:", err);
-    } finally {
-      setIsExporting(false);
+      console.error("Error al exportar imagen:", err);
     }
   };
 

@@ -10,16 +10,51 @@ const ExportTemplate = forwardRef(function ExportTemplate(
   const cellEmpty = isDark ? "bg-slate-700/50" : "bg-slate-200";
   const textColor = isDark ? "text-slate-100" : "text-slate-800";
 
-  // Normalizador defensivo para capturar hacerMenos / do_less / doLess (sea Array o String)
-  const parseLista = (data) => {
-    if (!data) return [];
-    if (Array.isArray(data)) return data;
-    if (typeof data === "string") return data.split("\n").filter(Boolean);
-    return [];
-  };
+  // Función ultra-defensiva para extraer texto o listas de cualquier formato posible
+  const renderizarContenido = (campoEsp, campoIng, campoDb) => {
+    // Buscamos el valor en cualquiera de las propiedades probables
+    const valor = notes?.[campoEsp] ?? notes?.[campoIng] ?? notes?.[campoDb];
 
-  const hacerMenosList = parseLista(notes?.hacerMenos || notes?.do_less || notes?.doLess);
-  const hacerMasList = parseLista(notes?.hacerMas || notes?.do_more || notes?.doMore);
+    if (!valor) return <p className="text-xs opacity-50 italic">Sin registros este mes...</p>;
+
+    // Caso A: Si es una cadena de texto (ej: un textarea con saltos de línea)
+    if (typeof valor === "string") {
+      if (!valor.trim()) return <p className="text-xs opacity-50 italic">Sin registros este mes...</p>;
+      
+      const lineas = valor.split("\n").filter((l) => l.trim() !== "");
+      return (
+        <ul className="space-y-1 text-xs opacity-90">
+          {lineas.map((linea, idx) => (
+            <li key={idx} className="flex items-start gap-1.5">
+              <span>•</span>
+              <span>{linea}</span>
+            </li>
+          ))}
+        </ul>
+      );
+    }
+
+    // Caso B: Si es un Arreglo (ej: [{ text: '...' }] o ['...'])
+    if (Array.isArray(valor)) {
+      if (valor.length === 0) return <p className="text-xs opacity-50 italic">Sin registros este mes...</p>;
+
+      return (
+        <ul className="space-y-1 text-xs opacity-90">
+          {valor.map((item, idx) => {
+            const textoItem = typeof item === "object" ? item?.text || item?.name || item?.content || JSON.stringify(item) : item;
+            return (
+              <li key={idx} className="flex items-start gap-1.5">
+                <span>•</span>
+                <span>{textoItem}</span>
+              </li>
+            );
+          })}
+        </ul>
+      );
+    }
+
+    return <p className="text-xs opacity-50 italic">Sin registros este mes...</p>;
+  };
 
   return (
     <div
@@ -128,43 +163,33 @@ const ExportTemplate = forwardRef(function ExportTemplate(
 
       {/* Notas de Reflexión */}
       <div className="grid grid-cols-2 gap-4">
-        {/* HACER MENOS */}
-        <div className={`p-4 rounded-xl border ${cardBg}`}>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-rose-400 mb-2">
-            HACER MENOS
-          </h3>
-          {hacerMenosList.length > 0 ? (
-            <ul className="space-y-1 text-xs opacity-90">
-              {hacerMenosList.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-1.5">
-                  <span className="text-rose-400">•</span>
-                  <span>{typeof item === "object" ? item.text || item.name : item}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-xs opacity-50 italic">Sin registros este mes...</p>
-          )}
-        </div>
+       {/* HACER MENOS */}
+<div className={`p-4 rounded-xl border ${cardBg}`}>
+  <h3 className="text-xs font-bold uppercase tracking-wider text-rose-400 mb-2">
+    HACER MENOS
+  </h3>
+  {notes?.do_less ? (
+    <p className="text-xs min-h-[50px] whitespace-pre-wrap opacity-90">
+      {notes.do_less}
+    </p>
+  ) : (
+    <p className="text-xs opacity-50 italic">Sin registros este mes...</p>
+  )}
+</div>
 
-        {/* HACER MÁS */}
-        <div className={`p-4 rounded-xl border ${cardBg}`}>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-2">
-            HACER MÁS
-          </h3>
-          {hacerMasList.length > 0 ? (
-            <ul className="space-y-1 text-xs opacity-90">
-              {hacerMasList.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-1.5">
-                  <span className="text-emerald-400">•</span>
-                  <span>{typeof item === "object" ? item.text || item.name : item}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-xs opacity-50 italic">Sin registros este mes...</p>
-          )}
-        </div>
+{/* HACER MÁS */}
+<div className={`p-4 rounded-xl border ${cardBg}`}>
+  <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-2">
+    HACER MÁS
+  </h3>
+  {notes?.do_more ? (
+    <p className="text-xs min-h-[50px] whitespace-pre-wrap opacity-90">
+      {notes.do_more}
+    </p>
+  ) : (
+    <p className="text-xs opacity-50 italic">Sin registros este mes...</p>
+  )}
+</div>
       </div>
     </div>
   );
