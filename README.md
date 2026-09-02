@@ -33,13 +33,4 @@ Cuenta con autenticación de usuarios y persistencia de datos en tiempo real med
 | **Autenticación** | Supabase Auth (JWT) |
 | **Despliegue** | Vercel / Netlify *(o la plataforma que utilices)* |
 
----
-
-## 🗄️ Esquema de Base de Datos
-
-El proyecto utiliza tres tablas principales en PostgreSQL dentro de Supabase con **Row Level Security (RLS)** activado:
-
-* **`habits`**: Almacena los hábitos del usuario (`id`, `user_id`, `title`, `position`).
-* **`habit_logs`**: Guarda el estado diario de cada hábito (`id`, `user_id`, `habit_id`, `date`, `status`). Posee un constraint `UNIQUE(habit_id, date)`.
-* **`monthly_notes`**: Guarda reflexiones de enfoque por período (`id`, `user_id`, `year_month`, `do_more`, `do_less`).
 
